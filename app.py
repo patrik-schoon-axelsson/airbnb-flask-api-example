@@ -6,6 +6,7 @@ from bson.json_util import dumps
 import logging
 from flask import Flask, jsonify, request
 from flask_pymongo import PyMongo
+from bson.errors import InvalidId
 from bson.objectid import ObjectId  
 
 app = Flask(__name__)
@@ -51,6 +52,8 @@ def main_entry():
             }
             new_doc = collection.insert_one(doc_post)
 
+            app.logger.info((f'An incoming requestion from client {request.remote_addr} CREATED document {new_doc.inserted_id}'))
+
             return jsonify({"status": 200, "message": f"Succesfully added document {new_doc.inserted_id}"})
         except KeyError as ke:
             return jsonify({"status": 400, "error": "KeyError: This endpoint will only accept a JSON object with the following key-value pairs: 'name', 'description', 'listing_url'"})
@@ -79,7 +82,7 @@ def crud_all():
     else:
         try:
             page_no = int(request.args.get('page_no'))
-        except ValueError as ve:
+        except ValueError:
             return jsonify({"status": 400, "error": "ValueError: 'page_no' query-parameter must be a number." })
 
     
@@ -88,7 +91,7 @@ def crud_all():
     else:
         try:
             docs = int(request.args.get('docs'))
-        except ValueError as ve:
+        except ValueError:
             return jsonify({"status": 400, "error": "ValueError: 'docs' query-parameter must be a number." })
 
     index = int(docs * page_no)
@@ -101,6 +104,18 @@ def crud_all():
 @app.route('/api/listings/<doc_id>', methods=['GET', 'DELETE', 'POST'])
 def paginate_collection(doc_id):
     collection = mongo.db.listingsAndReviews
+    """
+
+    If-block handling the TypeErrors resulting from the sample_airbnb database using
+    string-type for the "_id" field and new inserts from PyMongo being true MongoDB
+    ObjectID types. For more information, see README.
+
+    """
+    if collection.find_one({ "_id": doc_id }) == None:
+        try:
+            doc_id = ObjectId(doc_id)
+        except (InvalidId, TypeError):
+            return jsonify({"status": 400, "error": "InvalidID or Type Error: This it not a valid BSON object-ID, nor is there a string match in the database for this ID."})
 
     if request.method == 'GET':
         # Get single-doc handler. Returns Error 404 on faulty ID-field, so no need to except errors.
@@ -124,7 +139,8 @@ def paginate_collection(doc_id):
             "description": request_data["description"]
             }
             doc = collection.update_one({"_id": doc_id}, { "$set": updates })
-            
+
+            app.logger.info((f'An incoming requestion from client {request.remote_addr} updated document {doc_id}'))
             return dumps(collection.find_one_or_404({"_id": doc_id}))
         except KeyError as ke:
             return jsonify({"status": 400, "error": "KeyError: This endpoint only accepts valid JSON with the key-value pairs: 'listing_url', 'name', 'description' "})
