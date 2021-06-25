@@ -157,4 +157,6 @@ def paginate_collection(doc_id):
             return jsonify({"status": 404, "error": f"No item with ID field {doc_id}"})
 
 if __name__ == '__main__':
-    app.run(debug=os.environ.get("DEVELOPMENT"))
+    app.run(host=os.environ.get('IP'),
+            port=int(os.environ.get('PORT')),
+            debug=False)
