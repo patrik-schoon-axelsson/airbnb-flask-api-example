@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <title>Flask API Sample-App!</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <h1 class="text-center">Flask API sample app</h1>
+
+        <p class="text-center">This app is a sample API. You can find the github reposity for it <a href="https://github.com/patrik-schoon-axelsson/airbnb-flask-api-example" target="_blank">here</a>.</p>
+      </div>
+      <div class="row">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">
+                Endpoint
+              </th>
+              <th scope="col">
+                Methods
+              </th>
+              <th scope="col">
+                Input type
+              </th>
+              <th scope="col">
+                Response
+              </th>
+            </tr>
+          </thead>
+          <tr>
+            <th scope="row">
+              <strong>"/"</strong>
+            </th>
+            <th>
+              "GET", "POST"
+            </th>
+            <th>
+              GET: curl / browser <br>
+              POST: "application/json" & object containing "name", "listing_url" and "description" keys
+            </th>
+            <th>
+              GET response: index.html landing page<br>
+              POST response: JSON document of newly added document
+            </th>
+          </tr>
+          <tr>
+            <th scope="row">
+              <strong>"/api/&lt;query-string&gt;"</strong>
+            </th>
+            <th>
+              "GET"
+            </th>
+            <th>
+              query string, e.g: "/api/?page_no=2&docs=10"
+            </th>
+            <th>
+              GET response: Paginated database entries, where "page_no" equals off-set from beginning of collection and "docs" equals number of documents per query<br>
+            </th>
+          </tr>
+          <tr>
+            <th scope="row">
+              <strong>"/api/listings/&lt;document_id_string&gt;"</strong>
+            </th>
+            <th>
+              "GET", "POST", "DELETE"
+            </th>
+            <th>
+              GET: document_id_string URL-variable, matching the "_id" field of a database document<br>
+              POST: document_id_string URL-variable & application/json object, containing "name", "listing_url" and "description" keys.<br>
+              DELETE: document_id_string URL-variable matching the "_id" field of a database document
+            </th>
+            <th>
+              GET response: jsonified document-data matching document_id_string<br>
+              POST response: json object confirming the update was succesful.<br>
+              DELETE response: json object confirming deletion was succesful  
+            </th>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+    -->
+  </body>
+</html>

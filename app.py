@@ -4,7 +4,7 @@ if os.path.exists("env.py"):
     import env
 from bson.json_util import dumps
 import logging
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from flask_pymongo import PyMongo
 from bson.errors import InvalidId
 from bson.objectid import ObjectId  
@@ -39,7 +39,7 @@ def main_entry():
 
     """
     if request.method == "GET": 
-        return "Main URL!"
+        return render_template('index.html')
     elif request.method == "POST":
         try:
             collection = mongo.db.listingsAndReviews
