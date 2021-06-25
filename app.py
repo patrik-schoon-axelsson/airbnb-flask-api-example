@@ -58,7 +58,7 @@ def main_entry():
         except KeyError as ke:
             return jsonify({"status": 400, "error": "KeyError: This endpoint will only accept a JSON object with the following key-value pairs: 'name', 'description', 'listing_url'"})
 
-@app.route('/api/', methods=['GET', 'POST'])
+@app.route('/api/', methods=['GET'])
 def crud_all():
     
     """ 
