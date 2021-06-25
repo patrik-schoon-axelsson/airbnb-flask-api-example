@@ -1,6 +1,6 @@
 # A Flask REST-API example
 
-A small example of writing a REST-API, plugged into a cloud MongoDB and logging events to the heroku CLI.
+A small example of writing a REST-API in Python with the Flask framework, plugged into a cloud MongoDB and logging events to the heroku CLI. Uses the MongoDB sample datasets.
 
 ## 1) Design
 
@@ -15,17 +15,16 @@ The API has the following endpoints:
 
 * "/api/<query string>" - Query handler with pagination, allowing the browsing of the database. Accepts a standard query-string argument with two variables. "page_no" is the off-set from the collections start, "docs" is the query-results-per-page, e.g "/api/?page_no=2&docs=10" will return documents 10-20 listed from index 0 of the collection. _(Note: Uses the MongoDB "skip()" method, which is not ideal for larger collections. 5500 documents allows it to be relatively performant and it is quicker to implement. For more details on other options, see app.py comments on line  64.)_
 
-* "/api/listings/<document_id_string>" - Handler for specific document read, update and deletion. Allows methods "GET", "POST" and "DELETE. GET requests retrieves a document whose id field matches the document_id_string URL variable. POST requests updates a document whose id matches the document_id_string variable. DELETE requests removes a document matching the document_id_string. _(A quick note here is that the sample databases data has their _id field tagged as string-type and the PyMongo driver automatically tags new _id entries as the BSON ObjectID type. Querying ObjectID by string without changing its type to ObjetID will cause a false error 404 There is therefor an error-handling try/catch block on line 114 that acts as a sanity check, validating input strings as either valid BSON or as string _id values before continuing queries.)_
+* "/api/listings/<document_id_string>" - Handler for specific document read, update and deletion. Allows methods "GET", "POST" and "DELETE". GET requests retrieves a document whose id field matches the document_id_string URL variable. POST requests updates a document whose id matches the document_id_string variable. DELETE requests removes a document matching the document_id_string. _(A quick note here is that the sample databases data has their _id field tagged as string-type and the PyMongo driver automatically tags new _id keys as the BSON ObjectID type. Querying ObjectID by string without changing its type to ObjetID will cause a false error 404 if using flask-pymongos find_one_or_404() method. There is therefor an error-handling try/catch block on line 114 that acts as a sanity check, validating input strings as either valid BSON or as string _id values before continuing queries.)_
 
 ## 1.2)  Logging strategy
 
 ![Heroku Log Message](assets/README/heroku-cli-logs.png)
 
-Using the [Flask logging documentation](https://flask.palletsprojects.com/en/2.0.x/logging/) and some notes on Stack Overflow on how to translate this into gunicorn, for deployment onto Heroku, I designed the logging strategy as follows:
+Using the [Flask logging documentation](https://flask.palletsprojects.com/en/2.0.x/logging/) and some notes on Stack Overflow on how to prepare this for deployment, I designed the logging strategy as follows:
 
-* "Create" and "Read" log at the level of "Info", logs always include document IDs to make searching the logs easier in case of debugging. As create and read operations are fairly standard, these do not need to be raised in scope beyond "Info" in the log.
-* "Update" and "Delete" log at the level of "Warning", logs always include the IP the request was sent from as well as the ID of the document that has been changed, in order to provide easy-searching
-through the looks when required..
+* "Create" and "Read" type events log at the level of "Info", logs always include document IDs to make searching the logs easier in case of debugging. As create and read operations are fairly standard, these do not need to be raised in scope beyond "Info" in the log, so that a --tails operation will reveal them.
+* "Update" and "Delete" type events log at the level of "Warning", logs always include the IP the request was sent from as well as the ID of the document that has been changed, in order to provide easy-searching through the logs when required..
 
 # 2) Installation
 
@@ -87,3 +86,7 @@ A better solution would have been to enforce a proper schema for the _id field b
 
 While MongoDBs schemaless-design saves a great deal of development time in Python,
 by allowing the straight translation of dicts > bson, enforcing a schema allows for predictable responses on all collections. For future development, one might consider adding an ODM along the lines of MongoEngine to produce a fixed schema for the API, instead of the current example-CRUD that simply validates three fields as present.
+
+## 3.4) Logging improvements
+
+For a production-level application, far more rigorous logging is required than this short example-app. An example of an improvement for production would be using Flasks logging handler to set up automatic emailing of errors to admins for errors across a certain treshold.
